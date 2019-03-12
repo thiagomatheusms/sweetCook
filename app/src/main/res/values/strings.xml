@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ExoPlayer</string>
+
+    <string name="recipe_name">Recipe Name</string>
+    <string name="ingredients_label">Ingredients</string>
+    <string name="quantity_label">Quantity:</string>
+    <string name="measure_label">Measure:</string>
+    <string name="ingredient_label">Ingredient</string>
+
+
+</resources>
