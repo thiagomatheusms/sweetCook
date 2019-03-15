@@ -3,39 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
 
     <TextView
         android:id="@+id/tv_igredientName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:fontFamily="sans-serif"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="128dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_measure"
+        app:layout_constraintTop_toTopOf="@+id/tv_quantity"
         tools:text="@string/ingredient_label" />
 
     <TextView
-        android:id="@+id/tv_quantityLabel"
+        android:id="@+id/tv_quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/quantity_label"
-        tools:layout_editor_absoluteX="128dp"
-        tools:layout_editor_absoluteY="38dp" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/quantity_label" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tv_measure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_quantityLabel"
-        app:layout_constraintStart_toEndOf="@+id/tv_quantityLabel"
-        app:layout_constraintTop_toTopOf="@+id/tv_quantityLabel"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_marginLeft="2dp"
+        android:layout_marginStart="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_quantity"
+        app:layout_constraintStart_toEndOf="@+id/tv_quantity"
+        app:layout_constraintTop_toTopOf="@+id/tv_quantity"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="@string/measure_label" />
 
 
 </android.support.constraint.ConstraintLayout>

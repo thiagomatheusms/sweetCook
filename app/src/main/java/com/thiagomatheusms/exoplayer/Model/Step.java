@@ -1,8 +1,13 @@
 package com.thiagomatheusms.exoplayer.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
-public class Step {
+import java.io.Serializable;
+
+public class Step implements Parcelable, Serializable {
 
     @SerializedName("shortDescription")
     private String shortDescription;
@@ -12,6 +17,25 @@ public class Step {
     private String videoURL;
     @SerializedName("thumbnailURL")
     private String thumbnailURL;
+
+    protected Step(Parcel in) {
+        shortDescription = in.readString();
+        description = in.readString();
+        videoURL = in.readString();
+        thumbnailURL = in.readString();
+    }
+
+    public static final Creator<Step> CREATOR = new Creator<Step>() {
+        @Override
+        public Step createFromParcel(Parcel in) {
+            return new Step(in);
+        }
+
+        @Override
+        public Step[] newArray(int size) {
+            return new Step[size];
+        }
+    };
 
     public String getShortDescription() {
         return shortDescription;
@@ -43,5 +67,18 @@ public class Step {
 
     public void setThumbnailURL(String thumbnailURL) {
         this.thumbnailURL = thumbnailURL;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(shortDescription);
+        parcel.writeString(description);
+        parcel.writeString(videoURL);
+        parcel.writeString(thumbnailURL);
     }
 }
