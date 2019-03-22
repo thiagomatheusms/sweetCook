@@ -43,24 +43,6 @@ public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.Re
         String recipeName = mRecipes.get(i).getName();
         recipesAdapterViewHolder.mRecipeName.setText(recipeName);
 
-        switch (recipeName){
-
-            case "Cheesecake":
-                recipesAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.cheesecake);
-                break;
-
-            case "Yellow Cake":
-                recipesAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.yellowcake);
-                break;
-
-            case "Brownies":
-                recipesAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.brownies);
-                break;
-
-            case "Nutella Pie":
-                recipesAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.nutellapie);
-                break;
-        }
     }
 
     @Override

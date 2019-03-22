@@ -23,13 +23,16 @@
         <activity
             android:name=".DetailRecipeActivity"
             android:parentActivityName=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"></meta-data>
         </activity>
         <activity android:name=".DetailStepActivity"
-            android:parentActivityName=".DetailRecipeActivity">
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:parentActivityName=".DetailRecipeActivity"
+            android:theme="@style/AppThemeNoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DetailRecipeActivity"></meta-data>

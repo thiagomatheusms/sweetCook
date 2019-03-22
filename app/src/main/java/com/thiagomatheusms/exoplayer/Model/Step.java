@@ -25,6 +25,9 @@ public class Step implements Parcelable, Serializable {
         thumbnailURL = in.readString();
     }
 
+    public Step() {
+    }
+
     public static final Creator<Step> CREATOR = new Creator<Step>() {
         @Override
         public Step createFromParcel(Parcel in) {

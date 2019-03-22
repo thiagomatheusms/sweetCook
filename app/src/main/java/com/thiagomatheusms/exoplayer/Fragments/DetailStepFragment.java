@@ -1,14 +1,19 @@
 package com.thiagomatheusms.exoplayer.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,50 +26,63 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.util.Util;
+import com.thiagomatheusms.exoplayer.DetailStepActivity;
 import com.thiagomatheusms.exoplayer.Model.Step;
 import com.thiagomatheusms.exoplayer.R;
 import com.google.android.exoplayer2.*;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.source.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class DetailStepFragment extends Fragment implements Player.EventListener {
 
-    private SimpleExoPlayer exoPlayer;
     private PlayerView playerView;
     private TextView mStepDescription;
 
     private Uri uriVideo;
-    public List<Step> mListStep;
-    public int position;
+    private List<Step> mListStep;
+    private int position;
 
-
-    public DetailStepFragment() {
-    }
+    /*ExoPlayer's Variables*/
+    private SimpleExoPlayer player;
+    private boolean playWhenReady = true;
+    private int currentWindow = 0;
+    private long playbackPosition = 0;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        if (savedInstanceState != null) {
+            mListStep = savedInstanceState.getParcelableArrayList("STEPS");
+            position = savedInstanceState.getInt("INDEX");
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail_step, container, false);
 
-        Intent intent = getActivity().getIntent();
-        if (intent.hasExtra("POSITION") && intent.hasExtra("STEPS")) {
-            position = intent.getIntExtra("POSITION", position);
-            mListStep = intent.getParcelableArrayListExtra("STEPS");
+        mStepDescription = rootView.findViewById(R.id.tv_step_description);
 
-            mStepDescription = rootView.findViewById(R.id.tv_step_description);
+        playerView = rootView.findViewById(R.id.playerView);
+        playerView.requestFocus();
+
+        if (mListStep != null) {
+
+            if (!mListStep.get(position).getVideoURL().equals("")) {
+                playerView.setVisibility(View.VISIBLE);
+                uriVideo = Uri.parse(mListStep.get(position).getVideoURL());
+            } else {
+                playerView.setVisibility(View.GONE);
+            }
+
             mStepDescription.setText(mListStep.get(position).getDescription());
-
-            uriVideo = Uri.parse(mListStep.get(position).getVideoURL());
-
-            playerView = rootView.findViewById(R.id.playerView);
-            playerView.requestFocus();
         }
+
 
         return rootView;
     }
@@ -72,7 +90,18 @@ public class DetailStepFragment extends Fragment implements Player.EventListener
     @Override
     public void onStart() {
         super.onStart();
-        initializePlayer(uriVideo);
+        if (Util.SDK_INT > 23) {
+            initializePlayer(uriVideo);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        hideSystemUi();
+        if ((Util.SDK_INT <= 23 || player == null)) {
+            initializePlayer(uriVideo);
+        }
     }
 
     @Override
@@ -87,72 +116,67 @@ public class DetailStepFragment extends Fragment implements Player.EventListener
         releasePlayer();
     }
 
-    public void initializePlayer(Uri mediaUri) {
-        if (exoPlayer == null) {
+    /*player's methods*/
 
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity().getBaseContext(), new DefaultTrackSelector());
-            exoPlayer.addListener(this);
-            playerView.setPlayer(exoPlayer);
+    public void initializePlayer(Uri uriVideo) {
+        player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getContext()), new DefaultTrackSelector(), new DefaultLoadControl());
+        playerView.setPlayer(player);
 
-            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(getActivity().getBaseContext(), Util.getUserAgent(getActivity().getBaseContext(), "ExoPlayer"));
+        MediaSource mediaSource = buildMediaSourve(uriVideo);
 
-            ExtractorMediaSource extractorMediaSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaUri);
+        player.prepare(mediaSource, true, false);
 
-            exoPlayer.prepare(extractorMediaSource);
-            exoPlayer.setPlayWhenReady(true);
+        player.setPlayWhenReady(playWhenReady);
+        player.seekTo(currentWindow, playbackPosition);
 
 
-            Toast.makeText(getActivity().getBaseContext(), " Position: " + position + "", Toast.LENGTH_SHORT).show();
+    }
 
-        }
+    private MediaSource buildMediaSourve(Uri uri) {
+        return new ExtractorMediaSource.Factory(new DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri);
     }
 
     private void releasePlayer() {
-        if (exoPlayer != null) {
-            exoPlayer.stop();
-            exoPlayer.release();
-            exoPlayer = null;
-        }
-    }
-
-    public void nextVideo() {
-        if (position < (mListStep.size() - 1)) {
-            releasePlayer();
-            this.position++;
-
-            if (!mListStep.get(position).getVideoURL().equals("")) {
-                playerView.setVisibility(View.VISIBLE);
-                initializePlayer(Uri.parse(mListStep.get(position).getVideoURL()));
-            }else{
-                playerView.setVisibility(View.GONE);
-            }
-            mStepDescription.setText(mListStep.get(position).getDescription());
-
-            Toast.makeText(getActivity().getBaseContext(), mListStep.size() + " Position: " + position + "", Toast.LENGTH_SHORT).show();
-
-        }
-    }
-
-    public void backVideo() {
-        Toast.makeText(getActivity().getBaseContext(), mListStep.size() + " Position: " + position + "", Toast.LENGTH_SHORT).show();
-        if (position > 0) {
-            releasePlayer();
-            this.position--;
-            initializePlayer(Uri.parse(mListStep.get(position).getVideoURL()));
-            mStepDescription.setText(mListStep.get(position).getDescription());
+        if (player != null) {
+            playbackPosition = player.getCurrentPosition();
+            currentWindow = player.getCurrentWindowIndex();
+            playWhenReady = player.getPlayWhenReady();
+            player.release();
+            player.stop();
+            player = null;
         }
     }
 
 
-    /*Getter and Setter*/
-    public Uri getUriVideo() {
-        return uriVideo;
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    public void setUriVideo(Uri uriVideo) {
-        this.uriVideo = uriVideo;
+    /*getters and setters*/
+
+    public List<Step> getmListStep() {
+        return mListStep;
     }
+
+    public void setmListStep(List<Step> mListStep) {
+        this.mListStep = mListStep;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    /*interface's methods*/
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
@@ -172,10 +196,6 @@ public class DetailStepFragment extends Fragment implements Player.EventListener
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        int status = exoPlayer.getPlaybackState();
-
-        if (playWhenReady && (playbackState == Player.STATE_IDLE)) {
-        }
 
     }
 
@@ -208,4 +228,55 @@ public class DetailStepFragment extends Fragment implements Player.EventListener
     public void onSeekProcessed() {
 
     }
+
+    /*onSaveInstanceState*/
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelableArrayList("STEPS", (ArrayList<Step>) mListStep);
+        outState.putInt("INDEX", position);
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        int height = playerView.getHeight();
+
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            hideSystemUiFullScreen();
+            mStepDescription.setVisibility(View.GONE);
+            playerView.getLayoutParams().height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        } else {
+//            hideSystemUi2();
+            mStepDescription.setVisibility(View.VISIBLE);
+            playerView.getLayoutParams().height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUiFullScreen() {
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi2() {
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
 }
