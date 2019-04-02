@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Recipe implements Parcelable{
+public class Recipe implements Parcelable {
 
     @SerializedName("name")
     private String name;
@@ -37,6 +37,7 @@ public class Recipe implements Parcelable{
             return new Recipe[size];
         }
     };
+
 
     public String getName() {
         return name;

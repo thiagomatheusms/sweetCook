@@ -1,5 +1,7 @@
 package com.thiagomatheusms.exoplayer;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Parcelable;
@@ -61,7 +63,7 @@ public class DetailRecipeActivity extends AppCompatActivity implements StepListF
                     .add(R.id.step_detail_container, detailStepFragment)
                     .commit();
 
-        //Cellphone
+            //Cellphone
         } else {
             mTwoPane = false;
 
@@ -75,6 +77,7 @@ public class DetailRecipeActivity extends AppCompatActivity implements StepListF
             fragmentManager.beginTransaction()
                     .replace(R.id.steps_container, stepListFragment)
                     .commit();
+
 
         }
 
@@ -119,12 +122,20 @@ public class DetailRecipeActivity extends AppCompatActivity implements StepListF
 
         int currentOrientation = getResources().getConfiguration().orientation;
         if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ingredientsListFragment.getView().setVisibility(View.GONE);
-            stepFragments.setVisibility(View.GONE);
+            if (ingredientsListFragment != null && stepFragments != null) {
+                ingredientsListFragment.getView().setVisibility(View.GONE);
+                stepFragments.setVisibility(View.GONE);
+            }
 
         } else {
-            ingredientsListFragment.getView().setVisibility(View.VISIBLE);
-            stepFragments.setVisibility(View.VISIBLE);
+            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                ingredientsListFragment.getView().setVisibility(View.VISIBLE);
+                stepFragments.setVisibility(View.VISIBLE);
+            }
         }
+    }
+
+    public IngredientsListFragment getIngredientsListFragment() {
+        return ingredientsListFragment;
     }
 }

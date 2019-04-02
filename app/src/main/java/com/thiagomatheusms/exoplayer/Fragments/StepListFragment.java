@@ -24,7 +24,7 @@ public class StepListFragment extends Fragment implements StepListAdapter.StepAd
     private RecyclerView recyclerView;
     private StepListAdapter stepListAdapter;
     private OnStepClickListener mCallback;
-    List<Step> mSteps;
+    public static List<Step> mSteps;
 
     public interface OnStepClickListener {
         void onStepSelected(int position, List<Step> stepList);
