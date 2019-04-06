@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity implements MasterListFragmen
     @Override
     public void onRecipeSelected(Recipe recipe) {
 
-        /*If has two panels (tablet)*/
-
         Toast.makeText(this, recipe.getName(), Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, DetailRecipeActivity.class);
         intent.putParcelableArrayListExtra("INGREDIENTS", (ArrayList<Ingredient>) recipe.getIngredients());

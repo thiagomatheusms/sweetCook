@@ -12,7 +12,7 @@
         android:layout_margin="8dp"
         android:contentDescription="Teste"
         android:gravity="left"
-        android:text="@string/appwidget_text"
+        tools:text="@string/appwidget_text"
         android:textColor="#ffffff"
         android:textSize="16sp"
         android:textStyle="bold|italic" />
